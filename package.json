@@ -4,8 +4,8 @@
   "description": "",
   "main": "./src/server/app.js",
   "scripts": {
-    "start": "nodemon ./src/server/app.js",
-    "dev": "nodemon -w server/app.js server/app.js"
+    "start": "node ./src/server/app.js",
+    "dev": "nodemon -w ./src/server/ ./src/server/app.js"
   },
   "author": "Artem Kovtun_rtmkvtn@gmail.com",
   "license": "ISC",
