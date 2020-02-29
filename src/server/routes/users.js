@@ -1,16 +1,16 @@
 const router = require('express').Router();
-const fs = require('fs');
-const config = require('../config.js');
+const {
+  getUsers,
+  getUser,
+  createUser,
+  editUserInfo,
+  editUserAvatar,
+} = require('../controllers/users');
 
-router.get('/users', (req, res) => {
-  fs.promises.readFile(`${config.dbPath}/users.json`, { encoding: 'utf8' })
-    .then((data) => JSON.parse(data))
-    .then((json) => res.send(json))
-    .catch((err) => {
-      // eslint-disable-next-line no-console
-      console.error(err);
-      res.status(500).send({ message: 'Произошла ошибка на сервере' });
-    });
-});
+router.get('/users', getUsers);
+router.get('/users/:id', getUser);
+router.post('/users', createUser);
+router.patch('/users/me', editUserInfo);
+router.patch('/users/me/avatar', editUserAvatar);
 
 module.exports = router;
