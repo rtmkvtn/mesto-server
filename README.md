@@ -5,8 +5,8 @@
 Node.js server with express app.
 App connects to mongodb `mongodb://localhost:27017/mestodb` using mongoose.
 Db has 2 collections:
-  +users
-  +cards
+  + users
+  + cards
 
 Realized routes:
 ```
