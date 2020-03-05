@@ -12,14 +12,14 @@ Realized routes:
 ```
 GET /users — returns all the users
 GET /users/:userId - returns the user by :userId
-POST /users — creates new user
+POST /users — Takes *name*, *about* and *avatar* params as input from *req.body*. Adds new user with these params to the db. Returns this user's obj
 GET /cards — returns all the cards
-POST /cards — creates new card
+POST /cards — Takes *name* and *link* params as input from *req.body*. Creates new card in the db. Returns this card's obj
 DELETE /cards/:cardId — removes the card by :cardId
-PATCH /users/me — updates user's profile's info
-PATCH /users/me/avatar — updates user's avatar
-PUT /cards/:cardId/likes — likes the card by :cardId
-DELETE /cards/:cardId/likes — removes the lijke from the card by :cardId
+PATCH /users/me — Takes *name* and *about* params as input from *req.body*. Updates user's profile's info according to the input. Returns updated users's obj in its right before the update condition
+PATCH /users/me/avatar — Takes *avatar* param as input from *req.body*. Updates user's profile's info according to the input. Returns updated users's obj in its right before the update condition
+PUT /cards/:cardId/likes — Adds user's obj to :cardId's card likes array. Returns this card's obj
+DELETE /cards/:cardId/likes — Removes user's obj from :cardId's card likes array. Returns this card's obj
 ```
 All the requests with `res.status > 399` are logging in `/src/server/access.log` file by morgan logger.
 

@@ -6,7 +6,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cardsRouter = require('./routes/cards');
 const usersRouter = require('./routes/users');
-const wrongAddress = require('./routes/notFound');
+const wrongAddress = require('./routes/wrongAddress');
+const errorsHandler = require('./routes/errors');
 const config = require('./config.js');
 
 const app = express();
@@ -21,7 +22,10 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
-});
+})
+  .catch((err) => {
+    console.error(err);
+  });
 
 app.listen(config.PORT, () => {});
 //  routes
@@ -31,5 +35,7 @@ app.use((req, res, next) => {
   };
   next();
 });
+
 app.use('/', cardsRouter, usersRouter);
-app.use('*', wrongAddress);
+app.use(errorsHandler);
+app.use(wrongAddress);

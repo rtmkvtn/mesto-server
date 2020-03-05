@@ -1,7 +1,7 @@
 {
   "name": "sprint-12__node.js_express",
   "version": "1.0.0",
-  "description": "",
+  "description": "REST API on node.js/express. Connected to mongoDB via mongoose",
   "main": "./src/server/app.js",
   "scripts": {
     "start": "node ./src/server/app.js",
