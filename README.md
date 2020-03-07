@@ -2,8 +2,8 @@
 
 ## v 1.1.0
 
-Node.js server with express app.
-App connects to mongodb `mongodb://localhost:27017/mestodb` using mongoose.
+Node.js server with express app.  
+App connects to mongodb `mongodb://localhost:27017/mestodb` using mongoose.  
 Db has 2 collections:
   + users
   + cards
@@ -81,8 +81,8 @@ Returns json data of user
 
   + ### Error response:
     + **Code:** 500
-    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`
-  OR
+    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
+  OR  
     + **Code:** 404
     + **Content:** `{ message: 'Пользователь с данным id не найден.' }`
 
@@ -102,9 +102,9 @@ Adds new user to the db. Returns this user's json data.
   None
 
   + ### Data Params:
-  name = [String], 2 to 30 characters
-  about = [String], 2 to 30 characters
-  avatar = [url], link to the image
+  name = [String], 2 to 30 characters  
+  about = [String], 2 to 30 characters  
+  avatar = [url], link to the image  
 
   + ### Success Response:
     + **Code:** 200
@@ -121,8 +121,8 @@ Adds new user to the db. Returns this user's json data.
 
   + ### Error response:
     + **Code:** 500
-    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`
-  OR
+    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
+  OR  
     + **Code:** 422
     + **Content:** `{ "message": "Неверно заполнено одно из полей. Пользователь не может быть создан." }`
 
@@ -142,9 +142,9 @@ Updates users name and about data. Returns this user's json data in its before t
   None
 
   + ### Data Params:
-  name = [String], 2 to 30 characters
+  name = [String], 2 to 30 characters  
+  about = [String], 2 to 30 characters  
 
-  about = [String], 2 to 30 characters
   + ### Success Response:
     + **Code:** 200
     + **Content:** 
@@ -178,7 +178,7 @@ Updates users avatar. Returns this user's json data in its before the change con
   None
 
   + ### Data Params:
-  avatar = [url], link to the image
+  avatar = [url], link to the image  
 
   + ### Success Response:
     + **Code:** 200
@@ -195,8 +195,8 @@ Updates users avatar. Returns this user's json data in its before the change con
 
   + ### Error response:
     + **Code:** 500
-    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`
-  OR
+    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
+  OR  
     + **Code:** 422
     + **Content:** `{ "message": "Неверно заполнено одно из полей. Пользователь не может быть создан." }`
 
@@ -271,8 +271,8 @@ Adds new card to the cards collection. Returns this card's json data
   None
 
   + ### Data Params:
-  name = [String], 2 to 30 characters
-  link = [url], link to the image
+  name = [String], 2 to 30 characters  
+  link = [url], link to the image  
 
   + ### Success Response:
     + **Code:** 200
@@ -305,8 +305,8 @@ Adds new card to the cards collection. Returns this card's json data
 
   + ### Error response:
     + **Code:** 500
-    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`
-  OR
+    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
+  OR  
     + **Code:** 422
     + **Content:** `{ "message": "Неверно заполнено одно из полей. Карточка не может быть создана." }`
 
@@ -359,8 +359,8 @@ Removes card from cards collection. Returns this cards json data
 
   + ### Error response:
     + **Code:** 500
-    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`
-  OR
+    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
+  OR  
     + **Code:** 404
     + **Content:** `{ "message": "Карточка с данным id не найдена." }`
 
@@ -413,8 +413,8 @@ Adds user's json data to card's likes array. Returns this card's json data
 
   + ### Error response:
     + **Code:** 500
-    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`
-  OR
+    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
+  OR  
     + **Code:** 404
     + **Content:** `{ "message": "Карточка с данным id не найдена." }`
 
@@ -460,8 +460,8 @@ Removes user's json data from card's likes array. Returns this card's json data
 
   + ### Error response:
     + **Code:** 500
-    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`
-  OR
+    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
+  OR  
     + **Code:** 404
     + **Content:** `{ "message": "Карточка с данным id не найдена." }`
 
