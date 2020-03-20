@@ -1,3 +1,6 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const escape = require('escape-html');
 const User = require('../models/user');
 
 module.exports.getUsers = (req, res, next) => {
@@ -17,10 +20,45 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar } = req.body;
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
 
-  User.create({ name, about, avatar })
-    .then((user) => res.send(user))
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name: escape(name),
+      about: escape(about),
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then((user) => {
+      res.status(201).send({
+        _id: user._id,
+        email: user.email,
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+  const { NODE_ENV, JWT_SECRET } = process.env;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      if (!user) {
+        res.status(401).send({ message: 'Неверная почта или пароль.' });
+      }
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
+      res.send({ token });
+    })
     .catch((err) => {
       next(err);
     });
@@ -29,7 +67,7 @@ module.exports.createUser = (req, res, next) => {
 module.exports.editUserInfo = (req, res, next) => {
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name: `${name}`, about: `${about}` })
+  User.findByIdAndUpdate(req.user._id, { name: `${escape(name)}`, about: `${escape(about)}` })
     .then((user) => res.send(user))
     .catch((err) => {
       next(err);
