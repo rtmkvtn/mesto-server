@@ -57,7 +57,12 @@ module.exports.login = (req, res, next) => {
         res.status(401).send({ message: 'Неверная почта или пароль.' });
       }
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
-      res.send({ token });
+      res
+        .cookie('jwt', token, {
+          maxAge: 360000,
+          httpOnly: true,
+        })
+        .send({ token });
     })
     .catch((err) => {
       next(err);

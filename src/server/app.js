@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const fs = require('fs');
 const path = require('path');
@@ -19,6 +20,7 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
 const skipLogs = (req, res) => res.statusCode < 399;
 
 app.use(helmet());
+app.use(cookieParser());
 app.use(morgan('combined', { stream: accessLogStream, skip: skipLogs }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
