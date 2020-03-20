@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-
-const linkTest = /http(s)?:\/\/(w{3}\.)?(([\w-]+\.[a-z]+)|(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}))(:\d{2,5})?([/\w]+(#)?)?/i;
+const validator = require('validator');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -13,7 +12,7 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (v) => linkTest.test(v),
+      validator: (v) => validator.isURL(v),
       message: (props) => `${props.value} is not a link`,
     },
   },
