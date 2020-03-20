@@ -1,3 +1,4 @@
+const escape = require('escape-html');
 const Card = require('../models/card');
 
 module.exports.getCards = (req, res, next) => {
@@ -13,8 +14,7 @@ module.exports.getCards = (req, res, next) => {
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
 
-  Card.create({ name, link, owner: req.user._id })
-    .populate('owner')
+  Card.create({ name: escape(name), link, owner: req.user._id })
     .then((card) => res.send(card))
     .catch((err) => {
       next(err);
@@ -22,9 +22,20 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .populate('owner')
-    .then((card) => res.send(card))
+  Card.findById(req.params.cardId)
+    .then((cardCheck) => {
+      if (cardCheck.owner._id.toString() !== req.user._id) {
+        res.status(405).send({ message: 'У вас нет прав на изменение данной карточки.' });
+      }
+      return cardCheck;
+    })
+    .then((card) => {
+      Card.findByIdAndRemove(card._id)
+        .then((removedCard) => res.send({
+          removedCard,
+          message: 'Карточка удалена.',
+        }));
+    })
     .catch((err) => {
       next(err);
     });
