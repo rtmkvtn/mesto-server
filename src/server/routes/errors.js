@@ -1,7 +1,7 @@
 function errorsHandler(err, req, res, next) {
   const { url } = req;
   const { message } = err;
-  if (url.includes('user')) {
+  if (url.includes('user') || url.includes('sign')) {
     if (message.includes('Cast to ObjectId failed for value')) {
       res.status(404).send({ message: 'Пользователь с данным id не найден.' });
     } else if (message.includes('user validation failed:')) {
