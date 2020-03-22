@@ -5,6 +5,9 @@ function errorsHandler(err, req, res, next) {
     if (message.includes('Cast to ObjectId failed for value')) {
       res.status(404).send({ message: 'Пользователь с данным id не найден.' });
     } else if (message.includes('user validation failed:')) {
+      if (message.includes('expected `email` to be unique')) {
+        res.status(409).send({ message: 'Пользователь с таким email уже существует.' });
+      }
       res.status(422).send({ message: 'Неверно заполнено одно из полей. Пользователь не может быть создан.' });
     } else res.status(500).send({ message: 'Произошла ощибка на сервере' });
   }
