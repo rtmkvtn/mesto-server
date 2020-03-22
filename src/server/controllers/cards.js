@@ -24,6 +24,9 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((cardCheck) => {
+      if (!cardCheck) {
+        throw new Error('no such card');
+      }
       if (cardCheck.owner._id.toString() !== req.user._id) {
         res.status(405).send({ message: 'У вас нет прав на изменение данной карточки.' });
       }
@@ -45,7 +48,12 @@ module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .populate('owner')
     .populate('likes')
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (!card) {
+        throw new Error('no such card');
+      }
+      res.send(card);
+    })
     .catch((err) => {
       next(err);
     });
@@ -54,7 +62,12 @@ module.exports.likeCard = (req, res, next) => {
 module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .populate('owner')
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (!card) {
+        throw new Error('no such card');
+      }
+      res.send(card);
+    })
     .catch((err) => {
       next(err);
     });

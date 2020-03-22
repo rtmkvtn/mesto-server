@@ -15,9 +15,11 @@ function errorsHandler(err, req, res, next) {
   }
   if (url.includes('card')) {
     if (message.includes('Cast to ObjectId failed for value')) {
-      res.status(400).send({ message: 'Запрос не может быть понят сервером из-за некорректного синтаксиса.' });
+      res.status(400).send({ message: 'Запрос не может быть понят сервером из-за некорректного синтаксиса. Проверьте правильность id карточки.' });
     } else if (message.includes('card validation failed:')) {
       res.status(422).send({ message: 'Неверно заполнено одно из полей. Карточка не может быть создана.' });
+    } else if (message.includes('no such card')) {
+      res.status(404).send({ message: 'Карточка с данным id не найдена.' });
     } else res.status(500).send({ message: 'Произошла ощибка на сервере' });
   }
   return next(err);
