@@ -13,7 +13,12 @@ module.exports.getUsers = (req, res, next) => {
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.params.id)
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (!user) {
+        throw new Error('Cast to ObjectId failed for value');
+      }
+      return res.send(user);
+    })
     .catch((err) => {
       next(err);
     });
