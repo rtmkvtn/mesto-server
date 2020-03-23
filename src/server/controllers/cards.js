@@ -22,13 +22,10 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findById(req.params.cardId)
+  Card.findById(req.params.cardId).orFail(new Error('no such card'))
     .then((cardCheck) => {
-      if (!cardCheck) {
-        throw new Error('no such card');
-      }
       if (cardCheck.owner._id.toString() !== req.user._id) {
-        res.status(405).send({ message: 'У вас нет прав на изменение данной карточки.' });
+        res.status(403).send({ message: 'У вас нет прав на изменение данной карточки.' });
       }
       return cardCheck;
     })
