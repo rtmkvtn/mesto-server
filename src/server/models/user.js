@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+userSchema.pre('findOneAndUpdate', function (next) {
+  this.options.runValidators = true;
+  next();
+});
+
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {

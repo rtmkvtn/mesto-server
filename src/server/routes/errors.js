@@ -11,6 +11,12 @@ function errorsHandler(err, req, res, next) {
       res.status(422).send({ message: 'Неверно заполнено одно из полей. Пользователь не может быть создан.' });
     } else if (message.includes('no such user')) {
       res.status(404).send({ message: 'Пользователь с данным id не найден.' });
+    } else if (message.includes('Validation failed')) {
+      if (message.includes('Path `name`')) {
+        res.status(409).send({ message: 'Неверно указана, либо не указана информация в поле `name`. Это обязательное поле. Его длина должна составлять от 2 до 30 символов.' });
+      } else if (message.includes('is not a link')) {
+        res.status(409).send({ message: 'Переданное значение не является ссылкой.' });
+      } else res.status(409).send({ message: 'Неверно указана, либо не указана информация в поле `about`. Это обязательное поле. Его длина должна составлять от 2 до 30 символов.' });
     } else res.status(500).send({ message: 'Произошла ощибка на сервере' });
   }
   if (url.includes('card')) {
