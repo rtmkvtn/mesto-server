@@ -3,26 +3,18 @@ const jwt = require('jsonwebtoken');
 const escape = require('escape-html');
 const User = require('../models/user');
 const { JWT_SECRET } = require('../config');
+const { CustomError } = require('../middlewares/errors');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next)
 };
 
 module.exports.getUser = (req, res, next) => {
-  User.findById(req.params.id)
-    .then((user) => {
-      if (!user) {
-        throw new Error('no such user');
-      }
-      return res.send(user);
-    })
-    .catch((err) => {
-      next(err);
-    });
+  User.findById(req.params.id).orFail(new CustomError('Пользователь с данным id не найден.', 404))
+    .then((user) => res.send(user))
+    .catch(next)
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -35,13 +27,15 @@ module.exports.createUser = (req, res, next) => {
   } = req.body;
 
   bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name: escape(name),
-      about: escape(about),
-      avatar,
-      email,
-      password: hash,
-    }))
+    .then((hash) => User.create(
+      {
+        name: escape(name),
+        about: escape(about),
+        avatar,
+        email,
+        password: hash,
+      },
+    ))
     .then((user) => {
       res.status(201).send({
         _id: user._id,
@@ -49,8 +43,11 @@ module.exports.createUser = (req, res, next) => {
       });
     })
     .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return next(new CustomError(err.message, 400));
+      }
       next(err);
-    });
+    })
 };
 
 module.exports.login = (req, res, next) => {
@@ -59,7 +56,7 @@ module.exports.login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
-        res.status(401).send({ message: 'Неверная почта или пароль.' });
+        throw new CustomError('Неверная почта или пароль.', 401);
       }
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
       res
@@ -70,17 +67,18 @@ module.exports.login = (req, res, next) => {
         })
         .send({ token });
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next)
 };
 
 module.exports.editUserInfo = (req, res, next) => {
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name: `${escape(name)}`, about: `${escape(about)}` })
+  User.findOneAndUpdate(req.user._id, { name: `${escape(name)}`, about: `${escape(about)}` })
     .then((user) => res.send(user))
     .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return next(new CustomError(err.message, 400));
+      }
       next(err);
     });
 };
@@ -88,9 +86,12 @@ module.exports.editUserInfo = (req, res, next) => {
 module.exports.editUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { avatar: `${avatar}` })
+  User.findOneAndUpdate(req.user._id, { avatar: `${avatar}` })
     .then((user) => res.send({ user }))
     .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return next(new CustomError(err.message, 400));
+      }
       next(err);
     });
 };

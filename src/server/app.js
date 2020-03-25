@@ -12,7 +12,7 @@ const auth = require('./middlewares/auth');
 const cardsRouter = require('./routes/cards');
 const usersRouter = require('./routes/users');
 const wrongAddress = require('./routes/wrongAddress');
-const errorsHandler = require('./routes/errors');
+const { errorsHandler } = require('./middlewares/errors');
 const config = require('./config.js');
 
 const app = express();
@@ -25,7 +25,7 @@ app.use(morgan('combined', { stream: accessLogStream, skip: skipLogs }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
+mongoose.connect(config.dbAddress, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
