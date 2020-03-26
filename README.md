@@ -20,6 +20,9 @@ Returns array of json datas of all the users
   + ### Method:
   GET
 
+  + ### Authorization:
+  **Required** token from `req.cookies.jwt` 
+
   + ### URL Params:
   None
 
@@ -46,7 +49,10 @@ Returns array of json datas of all the users
 
   + ### Error response:
     + **Code:** 500 
-    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`
+    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
+  OR  
+    + **Code:** 401
+    + **Content:** `{ message: 'Необходима авторизация!' }` 
 
 ____    
 
@@ -59,6 +65,9 @@ Returns json data of user
 
   + ### Method:
   GET
+
+  + ### Authorization:
+  **Required** token from `req.cookies.jwt` 
 
   + ### URL Params:
     + **Required:**
@@ -84,7 +93,10 @@ Returns json data of user
     + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
   OR  
     + **Code:** 404
-    + **Content:** `{ message: 'Пользователь с данным id не найден.' }`
+    + **Content:** `{ message: 'Пользователь с данным id не найден.' }`  
+  OR  
+    + **Code:** 401
+    + **Content:** `{ message: 'Необходима авторизация!' }` 
 
 ____
 
@@ -93,10 +105,13 @@ ____
 Adds new user to the db. Returns this user's json data.
 
   + ### URL:
-  /users
+  /signup
 
   + ### Method:
   POST
+
+  + ### Authorization:
+  None 
 
   + ### URL Params:
   None
@@ -104,7 +119,9 @@ Adds new user to the db. Returns this user's json data.
   + ### Data Params:
   name = [String], 2 to 30 characters  
   about = [String], 2 to 30 characters  
-  avatar = [url], link to the image  
+  avatar = [url], link to the image 
+  email = [email], user's email 
+  password = [String], 8+ characters 
 
   + ### Success Response:
     + **Code:** 200
@@ -112,10 +129,7 @@ Adds new user to the db. Returns this user's json data.
     ```
     {
       "_id": "5e632ca3f4263a31a3c61015",
-      "name": "name",
-      "about": "about",
-      "avatar": "http://www.avatar.com/image.jpg",
-      "__v": 0
+      "email": "user@mail.com"
     }
     ```
 
@@ -125,6 +139,45 @@ Adds new user to the db. Returns this user's json data.
   OR  
     + **Code:** 422
     + **Content:** `{ "message": "Неверно заполнено одно из полей. Пользователь не может быть создан." }`
+
+____
+
+
+## Login
+
+Saves authorization token for the user in httpOnly cookie.
+
+  + ### URL:
+  /signin
+
+  + ### Method:
+  POST
+
+  + ### Authorization:
+  None 
+
+  + ### URL Params:
+  None
+
+  + ### Data Params:
+  email = [email], user's email 
+  password = [String], 8+ characters 
+
+  + ### Success Response:
+    + **Code:** 200
+    + **Content:** 
+    ```
+    {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTc0MWYwN2RmM2M1YjA2MzhlZjcxNzkiLCJpYXQiOjE1ODQ2ODcxODgsImV4cCI6MTU4NTI5MTk4OH0.HCO0_4yru_qy-MhGdtQ_R5pBC8gpI80xasdDDDaw"
+    }
+    ```
+
+  + ### Error response:
+    + **Code:** 500
+    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
+  OR  
+    + **Code:** 401
+    + **Content:** `{ "message": "Неверная почта или пароль." }`
 
 ____
 
@@ -138,6 +191,9 @@ Updates users name and about data. Returns this user's json data in its before t
   + ### Method:
   PATCH
 
+  + ### Authorization:
+  **Required** token from `req.cookies.jwt` 
+
   + ### URL Params:
   None
 
@@ -154,13 +210,17 @@ Updates users name and about data. Returns this user's json data in its before t
       "name": "name",
       "about": "about",
       "avatar": "http://www.avatar.com/image.jpg",
+      "email": "user@mail.com",
       "__v": 0
     }
     ```
 
   + ### Error response:
     + **Code:** 500
-    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`
+    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
+  OR  
+    + **Code:** 401
+    + **Content:** `{ message: 'Необходима авторизация!' }` 
 
 ____
 
@@ -173,6 +233,9 @@ Updates users avatar. Returns this user's json data in its before the change con
 
   + ### Method:
   PATCH
+
+  + ### Authorization:
+  **Required** token from `req.cookies.jwt` 
 
   + ### URL Params:
   None
@@ -189,6 +252,7 @@ Updates users avatar. Returns this user's json data in its before the change con
       "name": "name",
       "about": "about",
       "avatar": "http://www.avatar.com/image.jpg",
+      "email": "user@mail.com",
       "__v": 0
     }
     ```
@@ -198,7 +262,10 @@ Updates users avatar. Returns this user's json data in its before the change con
     + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
   OR  
     + **Code:** 422
-    + **Content:** `{ "message": "Неверно заполнено одно из полей. Пользователь не может быть создан." }`
+    + **Content:** `{ "message": "Неверно заполнено одно из полей. Пользователь не может быть создан." }`  
+  OR  
+    + **Code:** 401
+    + **Content:** `{ message: 'Необходима авторизация!' }` 
 
 ____
 
@@ -211,6 +278,9 @@ Returns array of json datas of all the cards
 
   + ### Method:
   GET
+
+  + ### Authorization:
+  **Required** token from `req.cookies.jwt` 
 
   + ### URL Params:
   None
@@ -253,7 +323,10 @@ Returns array of json datas of all the cards
 
   + ### Error response:
     + **Code:** 500
-    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`
+    + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
+  OR  
+    + **Code:** 401
+    + **Content:** `{ message: 'Необходима авторизация!' }` 
 
 ___
 
@@ -266,6 +339,9 @@ Adds new card to the cards collection. Returns this card's json data
 
   + ### Method:
   POST
+
+  + ### Authorization:
+  **Required** token from `req.cookies.jwt` 
 
   + ### URL Params:
   None
@@ -308,19 +384,25 @@ Adds new card to the cards collection. Returns this card's json data
     + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
   OR  
     + **Code:** 422
-    + **Content:** `{ "message": "Неверно заполнено одно из полей. Карточка не может быть создана." }`
+    + **Content:** `{ "message": "Неверно заполнено одно из полей. Карточка не может быть создана." }`  
+  OR  
+    + **Code:** 401
+    + **Content:** `{ message: 'Необходима авторизация!' }` 
 
 ____
 
 ## Delete Card
 
-Removes card from cards collection. Returns this cards json data
+Removes card from cards collection, if it's created by the user. Returns this cards json data
 
   + ### URL:
   /cards/:id
 
   + ### Method:
   DELETE
+
+  + ### Authorization:
+  **Required** token from `req.cookies.jwt` 
 
   + ### URL Params:
   id = card._id
@@ -362,7 +444,10 @@ Removes card from cards collection. Returns this cards json data
     + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
   OR  
     + **Code:** 404
-    + **Content:** `{ "message": "Карточка с данным id не найдена." }`
+    + **Content:** `{ "message": "Карточка с данным id не найдена." }`  
+  OR  
+    + **Code:** 401
+    + **Content:** `{ message: 'Необходима авторизация!' }` 
 
 ___
 
@@ -376,6 +461,9 @@ Adds user's json data to card's likes array. Returns this card's json data
   + ### Method:
   PUT
 
+  + ### Authorization:
+  **Required** token from `req.cookies.jwt` 
+
   + ### URL Params:
   id = card._id
 
@@ -416,7 +504,10 @@ Adds user's json data to card's likes array. Returns this card's json data
     + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
   OR  
     + **Code:** 404
-    + **Content:** `{ "message": "Карточка с данным id не найдена." }`
+    + **Content:** `{ "message": "Карточка с данным id не найдена." }`  
+  OR  
+    + **Code:** 401
+    + **Content:** `{ message: 'Необходима авторизация!' }` 
 
 ____
 
@@ -429,6 +520,9 @@ Removes user's json data from card's likes array. Returns this card's json data
 
   + ### Method:
   DELETE
+
+  + ### Authorization:
+  **Required** token from `req.cookies.jwt` 
 
   + ### URL Params:
   id = card._id
@@ -463,7 +557,10 @@ Removes user's json data from card's likes array. Returns this card's json data
     + **Content:** `{ message: 'Произошла ощибка на сервере.' }`  
   OR  
     + **Code:** 404
-    + **Content:** `{ "message": "Карточка с данным id не найдена." }`
+    + **Content:** `{ "message": "Карточка с данным id не найдена." }`  
+  OR  
+    + **Code:** 401
+    + **Content:** `{ message: 'Необходима авторизация!' }` 
 
 ____
 
@@ -476,8 +573,8 @@ All the requests with `res.status > 399` are logging in `/src/server/access.log`
 1. Clone repo:
 
 ```
-git clone git@github.com:fckXYZ/mesto.git
-cd mesto
+git clone https://github.com/fckXYZ/express_sprint-12.git
+cd express_sprint-12
 ```
 
 2. Install debendencies:

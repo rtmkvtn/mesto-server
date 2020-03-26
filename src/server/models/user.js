@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
-
-const linkTest = /http(s)?:\/\/(w{3}\.)?(([\w-]+\.[a-z]+)|(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}))(:\d{2,5})?([/\w]+(#)?)?/i;
+const uniqueValidator = require('mongoose-unique-validator');
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -19,10 +20,47 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (v) => linkTest.test(v),
+      validator: (v) => validator.isURL(v),
       message: (props) => `${props.value} is not a link`,
     },
   },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator: (v) => validator.isEmail(v),
+      message: (props) => `${props.value} is not an email`,
+    },
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: 8,
+    select: false,
+  },
 });
+
+userSchema.pre('findOneAndUpdate', function (next) {
+  this.options.runValidators = true;
+  next();
+});
+
+userSchema.statics.findUserByCredentials = function (email, password) {
+  return this.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) {
+        return false;
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return false;
+          }
+          return user;
+        });
+    });
+};
+userSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model('user', userSchema);
