@@ -1,6 +1,6 @@
-# express_sprint-12
+# mesto-server
 
-## v 1.1.0
+## v 1.2.0
 
 Node.js server with express app.  
 App connects to mongodb `mongodb://localhost:27017/mestodb` using mongoose.  
