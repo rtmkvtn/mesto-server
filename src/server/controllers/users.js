@@ -8,6 +8,9 @@ const BadRequestError = require('../errorsModules/BadRequestError');
 const AuthorizationError = require('../errorsModules/AuthorizationError');
 const ConflictError = require('../errorsModules/ConflictError');
 
+// avoiding undefined and special symbols in user's input
+const noSymbols = (input) => (escape(input) === 'undefined' ? '' : escape(input));
+
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
@@ -22,12 +25,12 @@ module.exports.getUser = (req, res, next) => {
 
 module.exports.createUser = (req, res, next) => {
   const {
-    name,
-    about,
     avatar,
     email,
     password,
   } = req.body;
+  const name = noSymbols(req.body.name);
+  const about = noSymbols(req.body.about);
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create(
@@ -77,7 +80,8 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.editUserInfo = (req, res, next) => {
-  const { name, about } = req.body;
+  const name = noSymbols(req.body.name);
+  const about = noSymbols(req.body.about);
 
   User.findOneAndUpdate(req.user._id, { name, about })
     .then((user) => res.send(user))

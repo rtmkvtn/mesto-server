@@ -573,8 +573,8 @@ All the requests with `res.status > 399` are logging in `/src/server/access.log`
 1. Clone repo:
 
 ```
-git clone git@github.com:fckXYZ/mesto.git
-cd mesto
+git clone https://github.com/fckXYZ/express_sprint-12.git
+cd express_sprint-12
 ```
 
 2. Install debendencies:
