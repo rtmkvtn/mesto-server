@@ -4,5 +4,5 @@ const dbAddress = 'mongodb://localhost:27017/mestodb';
 module.exports = {
   PORT,
   JWT_SECRET: NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-  dbAddress
+  dbAddress,
 };

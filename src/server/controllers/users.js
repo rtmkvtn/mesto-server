@@ -3,18 +3,21 @@ const jwt = require('jsonwebtoken');
 const escape = require('escape-html');
 const User = require('../models/user');
 const { JWT_SECRET } = require('../config');
-const { CustomError } = require('../middlewares/errors');
+const NotFoundError = require('../errorsModules/NotFoundError');
+const BadRequestError = require('../errorsModules/BadRequestError');
+const AuthorizationError = require('../errorsModules/AuthorizationError');
+const ConflictError = require('../errorsModules/ConflictError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch(next)
+    .catch(next);
 };
 
 module.exports.getUser = (req, res, next) => {
-  User.findById(req.params.id).orFail(new CustomError('Пользователь с данным id не найден.', 404))
+  User.findById(req.params.id).orFail(new NotFoundError('Пользователь с данным id не найден.'))
     .then((user) => res.send(user))
-    .catch(next)
+    .catch(next);
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -43,11 +46,14 @@ module.exports.createUser = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return next(new CustomError(err.message, 400));
+      if (err.message.includes('unique')) {
+        return next(new ConflictError('Пользователь с таким email уже зарегистрирован.'));
       }
-      next(err);
-    })
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestError(err.message));
+      }
+      return next(err);
+    });
 };
 
 module.exports.login = (req, res, next) => {
@@ -56,7 +62,7 @@ module.exports.login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
-        throw new CustomError('Неверная почта или пароль.', 401);
+        throw new AuthorizationError('Неверная почта или пароль.');
       }
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
       res
@@ -67,19 +73,19 @@ module.exports.login = (req, res, next) => {
         })
         .send({ token });
     })
-    .catch(next)
+    .catch(next);
 };
 
 module.exports.editUserInfo = (req, res, next) => {
   const { name, about } = req.body;
 
-  User.findOneAndUpdate(req.user._id, { name: `${escape(name)}`, about: `${escape(about)}` })
+  User.findOneAndUpdate(req.user._id, { name, about })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new CustomError(err.message, 400));
+        return next(new BadRequestError(err.message));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -90,8 +96,8 @@ module.exports.editUserAvatar = (req, res, next) => {
     .then((user) => res.send({ user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new CustomError(err.message, 400));
+        return next(new BadRequestError(err.message));
       }
-      next(err);
+      return next(err);
     });
 };

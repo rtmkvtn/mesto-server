@@ -1,13 +1,15 @@
 const escape = require('escape-html');
 const Card = require('../models/card');
-const { CustomError } = require('../middlewares/errors')
+const NotFoundError = require('../errorsModules/NotFoundError');
+const NoRightsError = require('../errorsModules/NoRightsError');
+const BadRequestError = require('../errorsModules/BadRequestError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .populate('owner')
     .populate('likes')
     .then((cards) => res.send(cards))
-    .catch(next)
+    .catch(next);
 };
 
 module.exports.createCard = (req, res, next) => {
@@ -17,17 +19,17 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new CustomError(err.message, 400));
+        return next(new BadRequestError(err.message));
       }
-      next(err);
+      return next(err);
     });
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findById(req.params.cardId).orFail(new CustomError('Карточка с данным id не найдена.', 404))
+  Card.findById(req.params.cardId).orFail(new NotFoundError('Карточка с данным id не найдена.'))
     .then((cardCheck) => {
-      if (cardCheck.owner._id.toString() !== req.user._id) {
-        throw new CustomError('У вас нет прав на изменение данной карточки.', 403);
+      if (!cardCheck.owner._id.equals(req.user._id)) {
+        throw new NoRightsError('У вас нет прав на изменение данной карточки.');
       }
       return cardCheck;
     })
@@ -47,11 +49,11 @@ module.exports.likeCard = (req, res, next) => {
     .populate('likes')
     .then((card) => {
       if (!card) {
-        throw new CustomError('Карточка с данным id не найдена.', 404);
+        throw new NotFoundError('Карточка с данным id не найдена.');
       }
       res.send(card);
     })
-    .catch(next)
+    .catch(next);
 };
 
 module.exports.dislikeCard = (req, res, next) => {
@@ -59,9 +61,9 @@ module.exports.dislikeCard = (req, res, next) => {
     .populate('owner')
     .then((card) => {
       if (!card) {
-        throw new CustomError('Карточка с данным id не найдена.', 404);
+        throw new NotFoundError('Карточка с данным id не найдена.');
       }
       res.send(card);
     })
-    .catch(next)
+    .catch(next);
 };
