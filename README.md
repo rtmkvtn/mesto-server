@@ -1,5 +1,7 @@
 # mesto-server
 
+[Link](http://www.api.mestoxyz.xyz)
+
 ## v 1.2.0
 
 Node.js server with express app.  
@@ -511,7 +513,7 @@ Adds user's json data to card's likes array. Returns this card's json data
 
 ____
 
-## Unlike Card
+## Dislike Card
 
 Removes user's json data from card's likes array. Returns this card's json data
 
@@ -564,8 +566,6 @@ Removes user's json data from card's likes array. Returns this card's json data
 
 ____
 
-
-All the requests with `res.status > 399` are logging in `/src/server/access.log` file by morgan logger.
 
 
 ## Installing

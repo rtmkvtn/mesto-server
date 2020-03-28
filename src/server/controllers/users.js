@@ -52,9 +52,6 @@ module.exports.createUser = (req, res, next) => {
       if (err.message.includes('unique')) {
         return next(new ConflictError('Пользователь с таким email уже зарегистрирован.'));
       }
-      if (err.name === 'ValidationError') {
-        return next(new BadRequestError(err.message));
-      }
       return next(err);
     });
 };
@@ -85,12 +82,7 @@ module.exports.editUserInfo = (req, res, next) => {
 
   User.findOneAndUpdate(req.user._id, { name, about })
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return next(new BadRequestError(err.message));
-      }
-      return next(err);
-    });
+    .catch(next);
 };
 
 module.exports.editUserAvatar = (req, res, next) => {
