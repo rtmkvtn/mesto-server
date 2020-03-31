@@ -41,11 +41,13 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+// validation for patch routes
 userSchema.pre('findOneAndUpdate', function (next) {
   this.options.runValidators = true;
   next();
 });
 
+// finding user on login route
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
@@ -61,6 +63,7 @@ userSchema.statics.findUserByCredentials = function (email, password) {
         });
     });
 };
+
 userSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model('user', userSchema);

@@ -1,29 +1,30 @@
 require('dotenv').config();
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
-const morgan = require('morgan');
-const fs = require('fs');
-const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { createUser, login } = require('./controllers/users');
+const { errors } = require('celebrate');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+const loginRouter = require('./routes/loginRouter');
 const auth = require('./middlewares/auth');
-const cardsRouter = require('./routes/cards');
-const usersRouter = require('./routes/users');
+const mainRouter = require('./routes/index');
 const wrongAddress = require('./routes/wrongAddress');
 const { errorsHandler } = require('./middlewares/errors');
 const config = require('./config.js');
 
 const app = express();
-const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
-const skipLogs = (req, res) => res.statusCode < 399;
 
 app.use(helmet());
 app.use(cookieParser());
-app.use(morgan('combined', { stream: accessLogStream, skip: skipLogs }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
 
 mongoose.connect(config.dbAddress, {
   useNewUrlParser: true,
@@ -36,12 +37,26 @@ mongoose.connect(config.dbAddress, {
 
 app.listen(config.PORT, () => {});
 //  routes
+app.use(limiter);
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+// crash-test
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
+// logging all requests to request.loq file
+app.use(requestLogger);
+
+app.use('/', loginRouter);
+// authorization to wright token into cookies.jwt
 app.use(auth);
 
-app.use('/', cardsRouter, usersRouter);
-app.use(errorsHandler);
+app.use(mainRouter);
+// logging all errors to error.log file
+app.use(errorLogger);
+// errors handlers
+app.use(errors());
 app.use(wrongAddress);
+app.use(errorsHandler);

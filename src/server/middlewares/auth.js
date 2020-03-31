@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config');
-
-const authErrorHandler = (res) => res.status(401).send({ message: 'Необходима авторизация!' });
+const AuthorizationError = require('../errorsModules/AuthorizationError');
+const constants = require('../constants');
 
 function auth(req, res, next) {
   const token = req.cookies.jwt;
@@ -11,7 +11,7 @@ function auth(req, res, next) {
   try {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    return authErrorHandler(res);
+    throw new AuthorizationError(constants.errors.NO_AUTH);
   }
   req.user = payload;
   return next();
