@@ -7,6 +7,7 @@ const NotFoundError = require('../errorsModules/NotFoundError');
 const BadRequestError = require('../errorsModules/BadRequestError');
 const AuthorizationError = require('../errorsModules/AuthorizationError');
 const ConflictError = require('../errorsModules/ConflictError');
+const constants = require('../constants');
 
 // avoiding undefined and special symbols in user's input
 const noSymbols = (input) => (escape(input) === 'undefined' ? '' : escape(input));
@@ -18,7 +19,7 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.getUser = (req, res, next) => {
-  User.findById(req.params.id).orFail(new NotFoundError('Пользователь с данным id не найден.'))
+  User.findById(req.params.id).orFail(new NotFoundError(constants.errors.NO_USER))
     .then((user) => res.send(user))
     .catch(next);
 };
@@ -50,7 +51,7 @@ module.exports.createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.message.includes('unique')) {
-        return next(new ConflictError('Пользователь с таким email уже зарегистрирован.'));
+        return next(new ConflictError(constants.errors.DUPL_EMAIL));
       }
       return next(err);
     });
@@ -62,7 +63,7 @@ module.exports.login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
-        throw new AuthorizationError('Неверная почта или пароль.');
+        throw new AuthorizationError(constants.errors.AUTHORIZATION_ERROR);
       }
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
       res

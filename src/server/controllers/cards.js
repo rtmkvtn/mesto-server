@@ -3,6 +3,7 @@ const Card = require('../models/card');
 const NotFoundError = require('../errorsModules/NotFoundError');
 const NoRightsError = require('../errorsModules/NoRightsError');
 const BadRequestError = require('../errorsModules/BadRequestError');
+const constants = require('../constants');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -26,17 +27,13 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findById(req.params.cardId).orFail(new NotFoundError('Карточка с данным id не найдена.'))
-    .then((cardCheck) => {
-      if (!cardCheck.owner._id.equals(req.user._id)) {
-        throw new NoRightsError('У вас нет прав на изменение данной карточки.');
-      }
-      return cardCheck;
-    })
+  Card.findById(req.params.cardId).orFail(new NotFoundError(constants.errors.NO_CARD))
     .then((card) => {
-      Card.findByIdAndRemove(card._id)
-        .then((removedCard) => res.send({
-          removedCard,
+      if (!card.owner._id.equals(req.user._id)) {
+        throw new NoRightsError(constants.errors.NO_RIGHTS_CARD);
+      }
+      Card.remove(card)
+        .then(() => res.send({
           message: 'Карточка удалена.',
         }));
     })
@@ -49,7 +46,7 @@ module.exports.likeCard = (req, res, next) => {
     .populate('likes')
     .then((card) => {
       if (!card) {
-        throw new NotFoundError('Карточка с данным id не найдена.');
+        throw new NotFoundError(constants.errors.NO_CARD);
       }
       res.send(card);
     })
@@ -61,7 +58,7 @@ module.exports.dislikeCard = (req, res, next) => {
     .populate('owner')
     .then((card) => {
       if (!card) {
-        throw new NotFoundError('Карточка с данным id не найдена.');
+        throw new NotFoundError(constants.errors.NO_CARD);
       }
       res.send(card);
     })
