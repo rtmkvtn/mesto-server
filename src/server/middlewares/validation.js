@@ -1,67 +1,77 @@
-const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 
+const urlRegExp = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/i;
 // validators vor /users route
-router.post('/signup', celebrate({
+const createUserValidation = celebrate({
   body: Joi.object().keys({
     email: Joi.string().email().required(),
     password: Joi.string().required().min(8),
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2).max(30),
-    avatar: Joi.string().required().min(1),
+    avatar: Joi.string().required().regex(urlRegExp).error(new Error('avatar is not a link!')),
   }),
-}));
+});
 
-router.post('/signin', celebrate({
+const loginValidation = celebrate({
   body: Joi.object().keys({
     email: Joi.string().email().required(),
     password: Joi.string().required().min(8),
   }),
-}));
+});
 
-router.patch('/users/me', celebrate({
+const editUserInfoValidation = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2).max(30),
   }),
-}));
+});
 
-router.patch('/users/me/avatar', celebrate({
+const editUserAvatarValidation = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().min(1),
+    avatar: Joi.string().required().regex(urlRegExp).error(new Error('avatar is not a link!')),
   }),
-}));
+});
 
-router.get('/users/:id', celebrate({
+const getUserValidation = celebrate({
   params: Joi.object().keys({
     id: Joi.string().alphanum().length(24),
   }),
-}));
+});
 
 // validators for /cards route
-router.post('/cards', celebrate({
+const createCardValidation = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().min(1),
+    link: Joi.string().required().regex(urlRegExp).error(new Error('avatar is not a link!')),
   }),
-}));
+});
 
-router.delete('/cards/:cardId', celebrate({
+const deleteCardValidation = celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().alphanum().length(24),
   }),
-}));
+});
 
-router.put('/cards/cardId/likes', celebrate({
+const likeCardValidation = celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().alphanum().length(24),
   }),
-}));
+});
 
-router.delete('/cards/cardId/likes', celebrate({
+const dislikeCardValidation = celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().alphanum().length(24),
   }),
-}));
+});
 
-module.exports = router;
+module.exports = {
+  createUserValidation,
+  loginValidation,
+  editUserInfoValidation,
+  editUserAvatarValidation,
+  getUserValidation,
+  createCardValidation,
+  deleteCardValidation,
+  likeCardValidation,
+  dislikeCardValidation,
+};
