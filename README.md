@@ -1,12 +1,7 @@
 # mesto-server
 
-[Link](http://www.api.mestoxyz.xyz)
 
 ## v 1.2.0
-
-### Available at:
-  + www.api.mestoxyz.xyz 
-  + 84.201.154.27 
 
 Node.js server with express app.  
 App connects to mongodb `mongodb://localhost:27017/mestodb` using mongoose.  
