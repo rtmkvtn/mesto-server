@@ -42,7 +42,7 @@
     "mongoose": "^5.9.2",
     "mongoose-unique-validator": "^2.0.3",
     "morgan": "^1.9.1",
-    "validator": "^13.7.0",
+    "validator": "^13.15.22",
     "winston": "^3.2.1"
   }
 }
